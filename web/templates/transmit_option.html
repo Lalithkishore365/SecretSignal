@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecretSignal - Transmit Option</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #001f3f;
+            color: white;
+            padding: 15px 30px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #ffcc00;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            padding: 20px;
+            margin-top: 80px;
+        }
+
+        .box {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 500px;
+            text-align: center;
+        }
+
+        .box h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .message-box {
+            margin-bottom: 20px;
+            padding: 12px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .button-group .btn {
+            padding: 15px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            background-color: #0066cc;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 47%;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .button-group .btn:hover {
+            background-color: #004d99;
+            transform: scale(1.03);
+        }
+
+        .button-group .btn.selected {
+            background-color: #ff5733;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        .submit-btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #555;
+        }
+
+        .footer {
+            background-color: #001f3f;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            z-index: 1001;
+          }
+      
+          .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+          }
+      
+          .button-group .btn {
+            padding: 15px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            background-color: #0066cc;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 47%;
+            text-align: center;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+          }
+      
+          .button-group .btn:hover {
+            background-color: #004d99;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+          }
+      
+          .submit-btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+      
+          .submit-btn:hover {
+            background-color: #555;
+            transform: scale(1.03);
+          }
+      
+          .box {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+          }
+      
+          .box.show {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        </style>
+      
+
+    <script>
+      // Mode select logic + toast
+      function selectMode(mode) {
+        document.getElementById(mode).checked = true;
+        document.querySelectorAll(".button-group .btn").forEach(btn => btn.classList.remove("selected"));
+        document.getElementById("btn-" + mode).classList.add("selected");
+        showToast("Selected: " + mode.charAt(0).toUpperCase() + mode.slice(1));
+      }
+  
+      // Toast popup
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.innerText = message;
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2000);
+      }
+  
+      // Animate box on load
+      window.onload = () => {
+        document.querySelector(".box").classList.add("show");
+      };
+    </script>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="title">SecretSignal</div>
+        <div>
+            <a href="/">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="box">
+            <h2>Select Transmission Mode</h2>
+
+            <div class="message-box">
+                <strong>Message:</strong><br>
+                {{ message|safe }}
+            </div>
+
+            <form action="/transmit" method="POST">
+                <div class="button-group">
+                    <label class="btn" id="btn-led" onclick="selectMode('led')">LED Blink</label>
+                    <input type="radio" name="mode" id="led" value="led" required>
+
+                    <label class="btn" id="btn-buzzer" onclick="selectMode('buzzer')">Buzzer</label>
+                    <input type="radio" name="mode" id="buzzer" value="buzzer" required>
+
+                    <label class="btn" id="btn-display" onclick="selectMode('display')">Just Display</label>
+                    <input type="radio" name="mode" id="display" value="display" required>
+
+                    <label class="btn" id="btn-decrypt" onclick="selectMode('decrypt')">Decrypt</label>
+                    <input type="radio" name="mode" id="decrypt" value="decrypt" required>
+                </div>
+
+                <input type="submit" value="Confirm" class="submit-btn">
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 SecretSignal | <a href="#">Privacy Policy</a></p>
+    </div>
+
+</body>
+</html>
